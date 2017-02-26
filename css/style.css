@@ -1,1 +1,44 @@
- /*Empty CSS file for your own CSS*/
+/*Empty CSS file for your own CSS*/
+
+.gap-page {
+    padding: 8px;
+}
+
+.select-periodo {
+    width: 100%;
+    text-align: center;
+}
+
+#panel-element-balanco {
+    width: 100%;
+}
+
+#panel-element-balanco table {
+    width: 100%;
+    text-align: center;
+}
+
+#panel-element-balanco table th {
+    width: 33%;
+    text-align: center;
+    padding: 5px;
+}
+
+.creditos {
+    color: blue;
+}
+
+.debitos {
+    color: red;
+}
+
+.even {
+    background-color: white;
+}
+.odd {
+    background-color: #E2E4FF;
+}
+
+.valor {
+    text-align: right;
+}
