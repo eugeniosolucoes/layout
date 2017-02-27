@@ -13,9 +13,7 @@
         <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="css/bootstrap-theme.min.css" type="text/css" />
         <link rel="stylesheet" href="css/style.css" type="text/css" />
-
-
-    </head>
+        
     <body>
         <div class="container-fluid gap-page">
             <div class="row">
@@ -25,27 +23,14 @@
                             <div class="panel-heading">
                                 <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-accordion" href="#panel-element-balanco">Balanço</a>
                             </div>
-                            <div id="panel-element-balanco" class="panel-collapse collapse in">
+                            <div id="panel-element-balanco" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <div class="select-periodo">
-                                        <button type="button" id="btn-previous"><</button>
-                                        <select id="list-month">
-                                            <option value="1">janeiro</option>
-                                            <option value="2">fevereiro</option>
-                                            <option value="3">março</option>
-                                            <option value="4">abril</option>
-                                            <option value="5">maio</option>
-                                            <option value="6">junho</option>
-                                            <option value="7">julho</option>
-                                            <option value="8">agosto</option>
-                                            <option value="9">setembro</option>
-                                            <option value="10">outubro</option>
-                                            <option value="11">novembro</option>
-                                            <option value="12">dezembro</option>
-                                        </select>
+                                        <button type="button" id="btn-previous" class="btn-xs"><</button>
+                                        <select id="list-month"></select>
                                         <button type="button" id="btn-hoje">hoje</button>
                                         <select id="list-year"></select>
-                                        <button type="button" id="btn-next">></button>
+                                        <button type="button" id="btn-next" class="btn-xs">></button>
                                     </div>
                                     <table>
                                         <tr>
@@ -68,7 +53,7 @@
                             </div>
                             <div id="panel-element-lancamento" class="panel-collapse collapse">
                                 <div class="panel-body">
-                                    <form role="form" class="" method="post" >
+                                    <form id="form-lancamento" role="form" class="" method="post" >
                                         <div class="control-group">
                                             <input type="hidden" name="id" id="id" value="" />
                                             <input type="text" id="descricao" name="descricao" placeholder="Descrição" value="" />
@@ -76,14 +61,6 @@
                                             <input type="number" step="0.01" id="valor" name="valor" placeholder="Valor" value="" />
                                             <input type="text" id="inclusao" name="inclusao" placeholder="Data" value=""  />
                                             <div class="control-group">
-                                                <label class="control-label" for="frequencia">Frequência
-                                                    <select name='frequencia' id='frequencia'>
-                                                        <option value="16"  >aleatório</option>
-                                                        <option value="15"  >anual</option>
-                                                        <option value="14"  >diário</option>
-                                                        <option value="13"  >mensal</option>
-                                                    </select>
-                                                </label>
                                                 <label class="control-label" for="tipo">Tipo
                                                     <select  name='tipo' id='tipo' >
                                                         <option value="debito" selected >Débito</option>
