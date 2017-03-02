@@ -42,3 +42,13 @@
 .valor {
     text-align: right;
 }
+
+.link_descricao {
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+
+.link_descricao:hover {
+    text-decoration: none;
+}

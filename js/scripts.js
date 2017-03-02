@@ -1,38 +1,21 @@
-// Empty JS for your own code to be here
-
-var fevereiro = {
-    "mes": 2,
-    "ano": 2017,
-    "creditos": 6046.22,
-    "debitos": 500,
-    "lancamentos": [
-        {"tipo": "credito", "descricao": "pagamento", "quantidade": 1, "inclusao": "01/02/2017", "valor": 6046.22},
-        {"tipo": "debito", "descricao": "condomínio", "quantidade": 1, "inclusao": "10/02/2017", "valor": 300},
-        {"tipo": "debito", "descricao": "transporte escolar", "quantidade": 1, "inclusao": "10/02/2017", "valor": 200}
-    ]
-};
-
-var marco = {
-    "mes": 3,
-    "ano": 2017,
-    "creditos": 7000,
-    "debitos": 500,
-    "lancamentos": [
-        {"tipo": "credito", "descricao": "pagamento", "quantidade": 1, "inclusao": "01/03/2017", "valor": 7000},
-        {"tipo": "debito", "descricao": "cartão de crédito", "quantidade": 1, "inclusao": "15/03/2017", "valor": 300},
-        {"tipo": "debito", "descricao": "riocard", "quantidade": 1, "inclusao": "10/03/2017", "valor": 200}
-    ]
-};
-
-var lista = {
-    "meses": [2, 3],
-    "anos": [2017],
-    "dados": [fevereiro, marco]
-};
+var lista;
 
 var selecionado;
 
+var tabela;
+
+
 $(document).ready(function () {
+
+
+    $.ajax({
+        async: false,
+        url: "dados/test.json",
+        dataType: "json",
+        success: function (data) {
+            lista = eval(data);
+        }
+    });
 
     carregar_meses();
     carregar_anos();
@@ -54,6 +37,19 @@ $(document).ready(function () {
         selecionar_lancamentos();
     });
 
+    $('#btn-limpar').click(function () {
+        lancamento_reset();
+    });
+
+    $('#btn-link').hide();
+
+
+    $('#inclusao').datepicker({
+        buttonText: "data do lançamento",
+        showButtonPanel: true,
+        changeMonth: true,
+        changeYear: true
+    });
 
 });
 
@@ -115,32 +111,81 @@ function now() {
 }
 
 function carregar_lista() {
-    $('#form-lancamento')[0].reset();
-    $('#list-lancamento tr').not(':first').remove();
+    lancamento_reset();
+    //$('#list-lancamento tr').not(':first').not(':last').remove();
+    try {
+        tabela.destroy();
+    } catch (e) {
+        console.info(e);
+    }
     var html = '';
     var x;
     for (x in selecionado.lancamentos) {
         html += '<tr ';
-        html += ((x % 2) === 0) ? 'class="odd" >' : 'class="even" >';
-        html += '<td><a href="#" onclick="get_lancamento(' + x + ')">' + selecionado.lancamentos[x].descricao + '</a></td>' +
-                '<td>' + selecionado.lancamentos[x].inclusao + '</td>';
+        html += ((x % 2) === 0) ? 'class="item odd" >' : 'class="item even" >';
+        html += '<td><a class="link_descricao" href="#" onclick="get_lancamento(' + x + ')">' + selecionado.lancamentos[x].descricao + '</a></td>' +
+                '<td>' + selecionado.lancamentos[x].f_inclusao + '</td>';
         html += selecionado.lancamentos[x].tipo === 'credito' ?
                 '<td class="creditos valor">' : '<td class="debitos valor">';
-        html += (selecionado.lancamentos[x].quantidade * selecionado.lancamentos[x].valor).toFixed(2) + '</td>' +
+        html += (selecionado.lancamentos[x].valor_total).toFixed(2) + '</td>' +
                 '</tr>\n';
     }
-    $('#list-lancamento tr').first().after(html);
+    $('#list-lancamento tbody').html(html);
+
+    tabela = $('#list-lancamento').DataTable(
+            {
+                "bPaginate": false,
+                "bStateSave": true,
+                "oLanguage": {
+                    "sInfo": "Resultado _START_ a _END_ de _TOTAL_ ",
+                    "sSearch": "Buscar:",
+                    "sLengthMenu": 'Registros: _MENU_ ',
+                    "sInfoFiltered": "(filtro de _MAX_ total registros)",
+                    "sInfoEmpty": "Nenhum resultado",
+                    "oPaginate": {
+                        "sPrevious": "Anterior",
+                        "sNext": "Próxima"
+                    }
+                },
+                "fnDrawCallback": function () {
+                    calcular();
+                }
+            }
+
+    );
+
+    $('#list-lancamento_filter label').
+            append('<button type="button" id="btn_limpar" class="btn btn-default">Limpar</button>');
+
+    $('#btn_limpar').click(function () {
+        $('input:text').val('');
+        $('#list-lancamento').dataTable().fnFilter('');
+    });
+
+    $("#btn-topo").click(function () {
+        $("html, body").animate({scrollTop: 0}, "slow");
+    });
 }
 
 function get_lancamento(item) {
 
     var lancamento = selecionado.lancamentos[item];
 
+    lancamento_reset();
+
     $('#descricao').val(lancamento.descricao);
     $('#quantidade').val(lancamento.quantidade);
     $('#valor').val(lancamento.valor);
-    $('#inclusao').val(lancamento.inclusao);
+    $('#inclusao').val(lancamento.f_inclusao);
     $('#tipo').val(lancamento.tipo);
+    $('#categorias').val(lancamento.categorias);
+    if (lancamento.link != null && lancamento.link.length != 0) {
+        $('#link').val(decodeURIComponent(lancamento.link));
+        $('#btn-link').attr('href', $('#link').val());
+        $('#btn-link').show();
+    } else {
+        $('#btn-link').hide();
+    }
 
     var result = $('a[href="#panel-element-lancamento"]').attr('aria-expanded');
     if ((result == 'true') ? false : true) {
@@ -151,9 +196,9 @@ function get_lancamento(item) {
 
 function selecionar_lancamentos() {
     var op = $('#list-month option:selected');
-    
+
     selecionado = lista.dados[op[0].index];
-    
+
     $('.creditos').html(selecionado.creditos.toFixed(2));
     $('.debitos').html(selecionado.debitos.toFixed(2));
 
@@ -167,5 +212,36 @@ function selecionar_lancamentos() {
         $('.valor-saldo').css('color', 'red');
     }
     carregar_lista();
+
+}
+
+function lancamento_reset() {
+    $('#form-lancamento')[0].reset();
+    $('#btn-link').hide();
+}
+
+function calcular() {
+    var creditos = 0;
+    var debitos = 0;
+    $("tr.item").each(function () {
+        $this = $(this)
+        var valor_credito = $this.find("td.creditos").html();
+        if (!isNaN(valor_credito)) {
+            creditos += new Number(valor_credito);
+        }
+        var value_debito = $this.find("td.debitos").html();
+        if (!isNaN(value_debito)) {
+            debitos += new Number(value_debito);
+        }
+    });
+    var resultado = creditos - debitos;
+    $('#total').html(Math.abs(resultado).toFixed(2));
+    if (resultado >= 0) {
+        $('#total').removeClass('debitos');
+        $('#total').addClass('creditos');
+    } else {
+        $('#total').removeClass('creditos');
+        $('#total').addClass('debitos');
+    }
 
 }
