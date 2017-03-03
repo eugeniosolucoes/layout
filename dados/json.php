@@ -20,6 +20,8 @@ function get_periodos() {
     if (is_numeric($usuario)) {
 
         $sql_periodos .= $usuario;
+        
+        $sql_periodos .= ' ORDER BY ano, mes ';
 
         $result = mysql_query($sql_periodos, $link);
 
@@ -48,6 +50,8 @@ function get_lancamentos() {
         $sql_lancamentos .= ' usuario = ' . $usuario;
         $sql_lancamentos .= ' AND mes = ' . $mes;
         $sql_lancamentos .= ' AND ano = ' . $ano;
+
+        $sql_lancamentos .= ' ORDER by ano, mes ' . $ano;
 
         $result = mysql_query($sql_lancamentos, $link);
 

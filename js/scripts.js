@@ -47,13 +47,13 @@ $(document).ready(function () {
 });
 
 function carregar_periodos() {
-    var meses = ['', 'janeiro', 'fevereiro', 'março', 'abril', 'maio',
-        'junho', 'julho', 'agosto', 'setembro', 'outubro',
-        'novembro', 'dezembro'];
+    var meses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio',
+        'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
+        'Novembro', 'Dezembro'];
     var x;
     for (x in lista) {
         var value = lista[x].ano + '-' + lista[x].mes;
-        var text = 'Período: ' + lista[x].ano + ' - ' + meses[lista[x].mes];
+        var text = lista[x].ano + ' (' + meses[lista[x].mes] +')';
         $('#list-periodos')
                 .append($("<option></option>")
                         .attr("value", value)
