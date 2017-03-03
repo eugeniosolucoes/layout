@@ -11,7 +11,7 @@ function get_conexao() {
 
 function get_periodos() {
 
-    $sql_periodos = "SELECT mes, ano FROM `vw_periodos_json` WHERE usuario = ";
+    $sql_periodos = "SELECT mes, ano, creditos, debitos, balanco FROM `vw_periodos_json` WHERE usuario = ";
 
     $link = get_conexao();
 
@@ -29,7 +29,7 @@ function get_periodos() {
         }
         Header('Content-Type: application/json');
 
-        die(json_encode($rows));
+        die(json_encode($rows, JSON_UNESCAPED_SLASHES |  JSON_NUMERIC_CHECK));
     }
 }
 

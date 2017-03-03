@@ -29,11 +29,9 @@
                                 <div id="panel-element-balanco" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <div class="select-periodo">
-                                            <button class="btn btn-default btn-lg btn-block" type="button" id="btn-previous">Anterior</button>
-                                            <select class="form-control" id="list-month"></select>
                                             <button class="btn btn-default btn-lg btn-block" type="button" id="btn-hoje">Mês atual</button>
-                                            <select class="form-control" id="list-year"></select>
-                                            <button class="btn btn-default btn-lg btn-block" type="button" id="btn-next">Próximo</button>
+                                            <select class="form-control" id="list-periodos">
+                                            </select>
                                         </div>
                                         <table>
                                             <tr>
@@ -167,6 +165,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
+                        <div id="list-lancamento-load">Carregando...</div>
                         <table class="table display" id="list-lancamento" >
                             <thead>
                                 <tr>

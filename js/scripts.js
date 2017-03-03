@@ -1,39 +1,32 @@
 var lista;
 
-var selecionado;
+var lancamentos;
 
 var tabela;
 
-
 $(document).ready(function () {
 
+    $("#list-lancamento-load").hide();
+
+    $("#list-lancamento").hide();
 
     $.ajax({
-        async: false,
-        url: "dados/test.json",
-        dataType: "json",
+        url: 'dados/json.php',
+        data: {comando: 1, usuario: 1},
+        dataType: 'json',
         success: function (data) {
-            lista = eval(data);
+            lista = data;
+            carregar_periodos();
+            now();
         }
     });
 
-    carregar_meses();
-    carregar_anos();
-
-    now();
-
-    $('#btn-previous').click(function () {
-        move_previous();
-    });
-    $('#btn-next').click(function () {
-        move_next();
-    });
 
     $('#btn-hoje').click(function () {
         now();
     });
 
-    $('#list-month').change(function () {
+    $('#list-periodos').change(function () {
         selecionar_lancamentos();
     });
 
@@ -53,81 +46,51 @@ $(document).ready(function () {
 
 });
 
-function carregar_meses() {
+function carregar_periodos() {
     var meses = ['', 'janeiro', 'fevereiro', 'março', 'abril', 'maio',
         'junho', 'julho', 'agosto', 'setembro', 'outubro',
         'novembro', 'dezembro'];
     var x;
-    for (x in lista.meses) {
-        $('#list-month')
+    for (x in lista) {
+        var value = lista[x].ano + '-' + lista[x].mes;
+        var text = 'Período: ' + lista[x].ano + ' - ' + meses[lista[x].mes];
+        $('#list-periodos')
                 .append($("<option></option>")
-                        .attr("value", lista.meses[x])
-                        .text(meses[lista.meses[x]]));
+                        .attr("value", value)
+                        .text(text));
     }
 }
 
-function carregar_anos() {
-    var x;
-    for (x in lista.anos) {
-        $('#list-year')
-                .append($("<option></option>")
-                        .attr("value", lista.anos[x])
-                        .text(lista.anos[x]));
-    }
-}
-
-function move_previous() {
-    var op = $('#list-month option:selected');
-    if (op[0].index > 0) {
-        var i = op.val();
-        i--;
-        $('#list-month').val(i);
-        selecionar_lancamentos();
-    }
-}
-
-function move_next() {
-    var op = $('#list-month option:selected');
-    var ops = $('#list-month option');
-    var index = op[0].index;
-    var last = ops.length - 1;
-    if (index < last) {
-        var i = op.val();
-        i++;
-        $('#list-month').val(i);
-        selecionar_lancamentos();
-    }
-}
 
 
 function now() {
     var now = new Date();
     var month = now.getMonth() + 1;
     var year = now.getFullYear();
-
-    $('#list-month').val(month);
-    $('#list-year').val(year);
+    $('#list-periodos').val(year + '-' + month);
     selecionar_lancamentos();
 }
 
 function carregar_lista() {
     lancamento_reset();
     //$('#list-lancamento tr').not(':first').not(':last').remove();
-    try {
-        tabela.destroy();
-    } catch (e) {
-        console.info(e);
+    if( tabela != null ) {
+        try {
+            tabela.destroy();
+        } catch (e) {
+            console.info(e);
+        }
     }
     var html = '';
     var x;
-    for (x in selecionado.lancamentos) {
+    for (x in lancamentos) {
         html += '<tr ';
         html += ((x % 2) === 0) ? 'class="item odd" >' : 'class="item even" >';
-        html += '<td><a class="link_descricao" href="#" onclick="get_lancamento(' + x + ')">' + selecionado.lancamentos[x].descricao + '</a></td>' +
-                '<td>' + selecionado.lancamentos[x].f_inclusao + '</td>';
-        html += selecionado.lancamentos[x].tipo === 'credito' ?
+        html += '<td><a class="link_descricao" href="#" onclick="get_lancamento(' + x + ')">' + lancamentos[x].descricao + '</a></td>' +
+                '<td>' + lancamentos[x].f_inclusao + '</td>';
+        html += lancamentos[x].tipo === 'credito' ?
                 '<td class="creditos valor">' : '<td class="debitos valor">';
-        html += (selecionado.lancamentos[x].valor_total).toFixed(2) + '</td>' +
+        html += (lancamentos[x].valor_total).toFixed(2) + '</td>' +
                 '</tr>\n';
     }
     $('#list-lancamento tbody').html(html);
@@ -165,11 +128,13 @@ function carregar_lista() {
     $("#btn-topo").click(function () {
         $("html, body").animate({scrollTop: 0}, "slow");
     });
+    
+    $("#list-lancamento").show();
 }
 
 function get_lancamento(item) {
 
-    var lancamento = selecionado.lancamentos[item];
+    var lancamento = lancamentos[item];
 
     lancamento_reset();
 
@@ -195,24 +160,39 @@ function get_lancamento(item) {
 }
 
 function selecionar_lancamentos() {
-    var op = $('#list-month option:selected');
+    var op = $('#list-periodos option:selected');
 
-    selecionado = lista.dados[op[0].index];
+    if (op[0] != null) {
 
-    $('.creditos').html(selecionado.creditos.toFixed(2));
-    $('.debitos').html(selecionado.debitos.toFixed(2));
+        var index = lista[op[0].index];
+        
+        $('.creditos').html(index.creditos.toFixed(2));
+        $('.debitos').html(index.debitos.toFixed(2));
 
-    var saldo = selecionado.creditos - selecionado.debitos;
+        var saldo = index.balanco;
 
-    $('.valor-saldo').html(Math.abs(saldo).toFixed(2));
+        $('.valor-saldo').html(Math.abs(saldo).toFixed(2));
 
-    if (saldo >= 0) {
-        $('.valor-saldo').css('color', 'blue');
-    } else {
-        $('.valor-saldo').css('color', 'red');
+        if (saldo >= 0) {
+            $('.valor-saldo').css('color', 'blue');
+        } else {
+            $('.valor-saldo').css('color', 'red');
+        }
+        
+        $("#list-lancamento-load").show();
+
+        $.ajax({
+            url: 'dados/json.php',
+            data: {comando: 2, usuario: 1, mes: index.mes, ano: index.ano},
+            dataType: 'json',
+            success: function (data) {
+                lancamentos = data;
+                carregar_lista();
+                $("#list-lancamento-load").hide();
+            }
+        });
+
     }
-    carregar_lista();
-
 }
 
 function lancamento_reset() {
