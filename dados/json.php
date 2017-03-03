@@ -51,7 +51,7 @@ function get_lancamentos() {
         $sql_lancamentos .= ' AND mes = ' . $mes;
         $sql_lancamentos .= ' AND ano = ' . $ano;
 
-        $sql_lancamentos .= ' ORDER by ano, mes ' . $ano;
+        $sql_lancamentos .= ' ORDER by ano, mes ';
 
         $result = mysql_query($sql_lancamentos, $link);
 
