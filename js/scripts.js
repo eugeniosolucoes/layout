@@ -68,8 +68,6 @@ function carregar_periodos() {
     });
 }
 
-
-
 function now() {
     var now = new Date();
     var month = now.getMonth() + 1;
@@ -254,7 +252,7 @@ function carregar_dados_periodos() {
 }
 
 function carregar_dados_lancamentos(index) {
-    var cache_name = 'lancamento-' + index.ano +'-'+index.mes +'-cache';
+    var cache_name = 'lancamento-' + index.ano + '-' + index.mes + '-cache';
     var cache = localStorage.getItem(cache_name);
     if (cache == null) {
         $.ajax({
