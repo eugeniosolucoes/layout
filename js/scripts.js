@@ -1,4 +1,4 @@
-var lista;
+var periodos;
 
 var lancamentos;
 
@@ -6,11 +6,16 @@ var tabela;
 
 $(document).ready(function () {
 
-    $("#list-lancamento-load").hide();
+    $("#load-data").hide();
 
     $("#list-lancamento").hide();
 
     carregar_dados_periodos();
+
+    $('#btn-load-data').click(function () {
+        localStorage.removeItem('periodos-cache');
+        carregar_dados_periodos();
+    });
 
     $('#btn-hoje').click(function () {
         now();
@@ -41,9 +46,9 @@ function carregar_periodos() {
         'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
         'Novembro', 'Dezembro'];
     var x;
-    for (x in lista) {
-        var value = lista[x].ano + '-' + lista[x].mes;
-        var text = meses[lista[x].mes];
+    for (x in periodos) {
+        var value = periodos[x].ano + '-' + periodos[x].mes;
+        var text = meses[periodos[x].mes];
         $('#list-periodos')
                 .append($("<option></option>")
                         .attr("value", value)
@@ -175,7 +180,7 @@ function selecionar_lancamentos() {
 
     if (op[0] != null) {
 
-        var index = lista[op[0].index];
+        var index = periodos[op[0].index];
 
         $('#label-year').html(index.ano);
 
@@ -192,9 +197,7 @@ function selecionar_lancamentos() {
             $('.valor-saldo').css('color', 'red');
         }
 
-        $("#list-lancamento-load").show();
-
-        carregar_dados_lancamentos(index);
+        show_lancamentos(index);
 
     }
 }
@@ -232,43 +235,53 @@ function calcular() {
 
 function carregar_dados_periodos() {
     var cache = localStorage.getItem("periodos-cache");
+    $("#load-data").show();
     if (cache == null) {
         $.ajax({
             url: 'dados/json.php',
-            data: {comando: 1, usuario: 1},
-            dataType: 'json',
-            success: function (data) {
-                lista = data;
-                localStorage.setItem("periodos-cache", JSON.stringify(data));
-                carregar_periodos();
-                now();
-            }
-        });
+            data: {comando: 'periodos', usuario: 1},
+            dataType: 'json'})
+                .done(function (data) {
+                    show_lancamentos
+                    periodos = data;
+                    localStorage.setItem("periodos-cache", JSON.stringify(data));
+                    carregar_periodos();
+                    now();
+                })
+                .fail(function () {
+                    alert('Falha ao recuperar os dados!');
+                })
+                .always(function () {
+                    $("#load-data").hide();
+                });
+
     } else {
-        lista = JSON.parse(localStorage.getItem("periodos-cache"));
+        periodos = JSON.parse(localStorage.getItem("periodos-cache"));
         carregar_periodos();
         now();
+        $("#load-data").hide();
     }
 }
 
-function carregar_dados_lancamentos(index) {
-    var cache_name = 'lancamento-' + index.ano + '-' + index.mes + '-cache';
-    var cache = localStorage.getItem(cache_name);
-    if (cache == null) {
-        $.ajax({
-            url: 'dados/json.php',
-            data: {comando: 2, usuario: 1, mes: index.mes, ano: index.ano},
-            dataType: 'json',
-            success: function (data) {
-                lancamentos = data;
-                localStorage.setItem(cache_name, JSON.stringify(data));
+function show_lancamentos(index) {
+    $("#load-data").show();
+    $.ajax({
+        url: 'dados/json.php',
+        timeout: 1000,
+        data: {comando: 'periodo', usuario: 1, mes: index.mes, ano: index.ano, balanco: index.balanco},
+        dataType: 'json'})
+            .done(function (data) {
+                if (data != null) {
+                    lancamentos = data;
+                }
                 carregar_lista();
-                $("#list-lancamento-load").hide();
-            }
-        });
-    } else {
-        lancamentos = JSON.parse(localStorage.getItem(cache_name));
-        carregar_lista();
-        $("#list-lancamento-load").hide();
-    }
+            })
+            .fail(function () {
+                lancamentos = index.lancamentos;
+                carregar_lista();
+            })
+            .always(function () {
+                $("#load-data").hide();
+            });
+
 }
