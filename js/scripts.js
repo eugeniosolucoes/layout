@@ -58,7 +58,7 @@ function carregar_periodos() {
                 values = $option.val().split('-'),
                 group = values[0];
 
-        if (group != prevGroup) {
+        if (group !== prevGroup) {
             $group = $('<optgroup />', {label: group}).appendTo('#list-periodos');
         }
 
@@ -81,7 +81,7 @@ function now() {
 
 function carregar_lista() {
     lancamento_reset();
-    if (tabela != null) {
+    if (tabela !== null) {
         try {
             tabela.destroy();
         } catch (e) {
@@ -96,7 +96,7 @@ function carregar_lista() {
         html += '<tr ';
         html += ((x % 2) === 0) ? 'class="item odd" >' : 'class="item even" >';
         html += '<td style="width: 80%;"><a class="link_descricao" href="#" onclick="get_lancamento(' + x + ')">' + lancamentos[x].descricao + '</a></td>';
-        html += '<td>' + (lancamentos[x].categorias == null ? '' : lancamentos[x].categorias) + '</td>';
+        html += '<td>' + (lancamentos[x].categorias === null ? '' : lancamentos[x].categorias) + '</td>';
         html += '<td>' + lancamentos[x].f_inclusao + '</td>';
         html += lancamentos[x].tipo === 'credito' ?
                 '<td class="creditos valor">' : '<td class="debitos valor">';
@@ -184,7 +184,7 @@ function get_lancamento(item) {
     $('#inclusao').val(lancamento.f_inclusao);
     $('#tipo').val(lancamento.tipo);
     $('#categorias').val(lancamento.categorias);
-    if (lancamento.link != null && lancamento.link.length != 0) {
+    if (lancamento.link !== null && lancamento.link.length !== 0) {
         $('#link').val(decodeURIComponent(lancamento.link));
         $('#btn-link').attr('href', $('#link').val());
         $('#btn-link').show();
@@ -193,7 +193,7 @@ function get_lancamento(item) {
     }
 
     var result = $('a[href="#panel-element-lancamento"]').attr('aria-expanded');
-    if ((result == 'true') ? false : true) {
+    if ((result === 'true') ? false : true) {
         $('a[href="#panel-element-lancamento"]').trigger('click');
     }
     $('#descricao').focus();
@@ -202,7 +202,7 @@ function get_lancamento(item) {
 function selecionar_lancamentos() {
     var op = $('#list-periodos option:selected');
 
-    if (op[0] != null) {
+    if (op[0] !== null) {
 
         var index = periodos[op[0].index];
 
@@ -222,7 +222,7 @@ function calcular() {
     var creditos = 0;
     var debitos = 0;
     $("tr.item").each(function () {
-        $this = $(this)
+        $this = $(this);
         var valor_credito = $this.find("td.creditos").html();
         if (!isNaN(valor_credito)) {
             creditos += new Number(valor_credito);
@@ -247,13 +247,12 @@ function calcular() {
 function carregar_dados_periodos() {
     var cache = localStorage.getItem("periodos-cache");
     $("#div-load-data").show();
-    if (cache == null) {
+    if (cache === null) {
         $.ajax({
             url: 'dados/json.php',
             data: {comando: 'periodos', usuario: 1},
             dataType: 'json'})
                 .done(function (data) {
-                    show_lancamentos
                     periodos = data;
                     localStorage.setItem("periodos-cache", JSON.stringify(data));
                     carregar_periodos();
@@ -283,7 +282,7 @@ function show_lancamentos(index) {
         data: {comando: 'periodo', usuario: 1, mes: index.mes, ano: index.ano},
         dataType: 'json'})
             .done(function (data) {
-                if (data != null) {
+                if (data !== null) {
                     lancamentos = data[0].lancamentos;
                 }
                 carregar_lista();
@@ -307,7 +306,7 @@ function update_cache() {
             var i = op[0].index;
             console.log(i);
             var vcreditos = new Number($('.creditos').html()).toFixed(2);
-            var vdebitos = new Number($('.debitos').html()).toFixed(2)
+            var vdebitos = new Number($('.debitos').html()).toFixed(2);
             index['creditos'] = vcreditos;
             index['debitos'] = vdebitos;
             index['balanco'] = saldo_atual.toFixed(2);
