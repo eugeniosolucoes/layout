@@ -88,6 +88,16 @@ function carregar_lista() {
             console.info(e);
         }
     }
+    preencher_tabela();
+
+    configurar_datatable();
+
+    update_cache();
+
+    $("#list-lancamento").show();
+}
+
+function preencher_tabela() {
     var html = '';
     var creditos = 0;
     var debitos = 0;
@@ -127,7 +137,9 @@ function carregar_lista() {
     }
 
     $('#list-lancamento tbody').html(html);
+}
 
+function configurar_datatable() {
     tabela = $('#list-lancamento').DataTable(
             {
                 "bPaginate": false,
@@ -166,10 +178,6 @@ function carregar_lista() {
     $("#btn-topo").click(function () {
         $("html, body").animate({scrollTop: 0}, "slow");
     });
-
-    update_cache();
-
-    $("#list-lancamento").show();
 }
 
 function get_lancamento(item) {
@@ -295,7 +303,6 @@ function show_lancamentos(index) {
             });
 
 }
-
 
 function update_cache() {
     var op = $('#list-periodos option:selected');
