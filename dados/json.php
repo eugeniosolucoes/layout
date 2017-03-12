@@ -21,11 +21,9 @@ function get_periodos() {
         $result = mysql_query($sql_periodos, $link);
         $rows = array();
         while ($r = mysql_fetch_assoc($result)) {
-            if($r['ano'] >= ($ano_corrente - $limite) && $r['ano'] <= ($ano_corrente  + $limite)){
+            if ($r['ano'] >= ($ano_corrente - $limite) && $r['ano'] <= ($ano_corrente + $limite)) {
                 $r['lancamentos'] = get_lancamento($usuario, $r['ano'], $r['mes']);
-            } else {
-                $r['balanco'] = 0;
-            }
+            } 
             $rows[] = $r;
         }
         Header('Content-Type: application/json');
@@ -39,7 +37,6 @@ function get_periodo() {
     $usuario = filter_input(INPUT_GET, 'usuario');
     $ano = filter_input(INPUT_GET, 'ano');
     $mes = filter_input(INPUT_GET, 'mes');
-    $balanco = filter_input(INPUT_GET, 'balanco');
     if (is_numeric($usuario) && is_numeric($ano) && is_numeric($mes)) {
         $sql_periodos .= $usuario;
         $sql_periodos .= ' AND ano = ' . $ano;
@@ -47,11 +44,8 @@ function get_periodo() {
         $result = mysql_query($sql_periodos, $link);
         $rows = array();
         while ($r = mysql_fetch_assoc($result)) {
-            if ($balanco != $r['balanco']) {
-                $r['lancamentos'] = get_lancamento($usuario, $r['ano'], $r['mes']);
-            } else {
-                die();
-            }
+            $r['lancamentos'] = get_lancamento($usuario, $r['ano'], $r['mes']);
+            $rows[] = $r;
         }
         Header('Content-Type: application/json');
         die(json_encode($rows, JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));

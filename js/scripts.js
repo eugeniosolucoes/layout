@@ -4,18 +4,15 @@ var lancamentos;
 
 var tabela;
 
+var saldo_atual = 0;
+
 $(document).ready(function () {
 
-    $("#load-data").hide();
+    $("#div-load-data").hide();
 
     $("#list-lancamento").hide();
 
     carregar_dados_periodos();
-
-    $('#btn-load-data').click(function () {
-        localStorage.removeItem('periodos-cache');
-        carregar_dados_periodos();
-    });
 
     $('#btn-hoje').click(function () {
         now();
@@ -46,6 +43,7 @@ function carregar_periodos() {
         'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
         'Novembro', 'Dezembro'];
     var x;
+    $('#list-periodos').empty();
     for (x in periodos) {
         var value = periodos[x].ano + '-' + periodos[x].mes;
         var text = meses[periodos[x].mes];
@@ -83,7 +81,6 @@ function now() {
 
 function carregar_lista() {
     lancamento_reset();
-    //$('#list-lancamento tr').not(':first').not(':last').remove();
     if (tabela != null) {
         try {
             tabela.destroy();
@@ -92,6 +89,8 @@ function carregar_lista() {
         }
     }
     var html = '';
+    var creditos = 0;
+    var debitos = 0;
     var x;
     for (x in lancamentos) {
         html += '<tr ';
@@ -103,7 +102,30 @@ function carregar_lista() {
                 '<td class="creditos valor">' : '<td class="debitos valor">';
         html += (lancamentos[x].valor_total).toFixed(2) + '</td>' +
                 '</tr>\n';
+        if (lancamentos[x].tipo === 'credito') {
+            if (!isNaN(lancamentos[x].valor_total)) {
+                creditos += lancamentos[x].valor_total;
+            }
+        } else {
+            if (!isNaN(lancamentos[x].valor_total)) {
+                debitos += lancamentos[x].valor_total;
+            }
+        }
     }
+
+    $('.creditos').html(new Number(creditos).toFixed(2));
+    $('.debitos').html(new Number(debitos).toFixed(2));
+
+    saldo_atual = creditos - debitos;
+
+    $('.valor-saldo').html(Math.abs(saldo_atual).toFixed(2));
+
+    if (saldo_atual >= 0) {
+        $('.valor-saldo').css('color', 'blue');
+    } else {
+        $('.valor-saldo').css('color', 'red');
+    }
+
     $('#list-lancamento tbody').html(html);
 
     tabela = $('#list-lancamento').DataTable(
@@ -145,6 +167,8 @@ function carregar_lista() {
         $("html, body").animate({scrollTop: 0}, "slow");
     });
 
+    update_cache();
+
     $("#list-lancamento").show();
 }
 
@@ -184,19 +208,6 @@ function selecionar_lancamentos() {
 
         $('#label-year').html(index.ano);
 
-        $('.creditos').html(index.creditos.toFixed(2));
-        $('.debitos').html(index.debitos.toFixed(2));
-
-        var saldo = index.balanco;
-
-        $('.valor-saldo').html(Math.abs(saldo).toFixed(2));
-
-        if (saldo >= 0) {
-            $('.valor-saldo').css('color', 'blue');
-        } else {
-            $('.valor-saldo').css('color', 'red');
-        }
-
         show_lancamentos(index);
 
     }
@@ -235,7 +246,7 @@ function calcular() {
 
 function carregar_dados_periodos() {
     var cache = localStorage.getItem("periodos-cache");
-    $("#load-data").show();
+    $("#div-load-data").show();
     if (cache == null) {
         $.ajax({
             url: 'dados/json.php',
@@ -249,39 +260,61 @@ function carregar_dados_periodos() {
                     now();
                 })
                 .fail(function () {
-                    alert('Falha ao recuperar os dados!');
+                    $("#div-load-data").html('Falha ao recuperar os dados!');
                 })
                 .always(function () {
-                    $("#load-data").hide();
+                    $("#div-load-data").hide();
+                    $("#div-load-data").html('Carregando...');
                 });
 
     } else {
         periodos = JSON.parse(localStorage.getItem("periodos-cache"));
         carregar_periodos();
         now();
-        $("#load-data").hide();
+        $("#div-load-data").hide();
     }
 }
 
 function show_lancamentos(index) {
-    $("#load-data").show();
+    $("#div-load-data").show();
     $.ajax({
         url: 'dados/json.php',
-        timeout: 1000,
-        data: {comando: 'periodo', usuario: 1, mes: index.mes, ano: index.ano, balanco: index.balanco},
+        timeout: 3000,
+        data: {comando: 'periodo', usuario: 1, mes: index.mes, ano: index.ano},
         dataType: 'json'})
             .done(function (data) {
                 if (data != null) {
-                    lancamentos = data;
+                    lancamentos = data[0].lancamentos;
                 }
                 carregar_lista();
+                $("#div-load-data").hide();
             })
             .fail(function () {
                 lancamentos = index.lancamentos;
                 carregar_lista();
-            })
-            .always(function () {
-                $("#load-data").hide();
+                $("#div-load-data").hide();
             });
 
+}
+
+
+function update_cache() {
+    var op = $('#list-periodos option:selected');
+
+    if (op[0] !== null) {
+        var index = periodos[op[0].index];
+        if (saldo_atual.toFixed(2) !== new Number(index.balanco).toFixed(2)) {
+            var i = op[0].index;
+            console.log(i);
+            var vcreditos = new Number($('.creditos').html()).toFixed(2);
+            var vdebitos = new Number($('.debitos').html()).toFixed(2)
+            index['creditos'] = vcreditos;
+            index['debitos'] = vdebitos;
+            index['balanco'] = saldo_atual.toFixed(2);
+            index['lancamentos'] = lancamentos;
+            console.log(index);
+            periodos[i] = index;
+            localStorage.setItem("periodos-cache", JSON.stringify(periodos));
+        }
+    }
 }
