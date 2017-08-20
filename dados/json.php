@@ -73,7 +73,7 @@ function get_balanco() {
 }
 
 function get_categorias() {
-    $sql_periodos = "SELECT id, tipo, categorias, usuario `vw_categorias_json` WHERE usuario = ";
+    $sql_periodos = "SELECT id, case when tipo = 1 then 'credito' else 'debito' end as tipo, descricao FROM `categoria` WHERE usuario = ";
     $link = get_conexao();
     $usuario = filter_input(INPUT_GET, 'usuario');
     if (is_numeric($usuario)) {
@@ -89,7 +89,7 @@ function get_categorias() {
 }
 
 function get_frequencias() {
-    $sql_periodos = "SELECT id, descricao, usuario `frequencia` WHERE usuario = ";
+    $sql_periodos = "SELECT id, descricao FROM `frequencia` WHERE usuario = ";
     $link = get_conexao();
     $usuario = filter_input(INPUT_GET, 'usuario');
     if (is_numeric($usuario)) {
