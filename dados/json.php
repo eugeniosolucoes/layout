@@ -72,6 +72,38 @@ function get_balanco() {
     }
 }
 
+function get_categorias() {
+    $sql_periodos = "SELECT id, tipo, categorias, usuario `vw_categorias_json` WHERE usuario = ";
+    $link = get_conexao();
+    $usuario = filter_input(INPUT_GET, 'usuario');
+    if (is_numeric($usuario)) {
+        $sql_periodos .= $usuario;
+        $result = mysql_query($sql_periodos, $link);
+        $rows = array();
+        while ($r = mysql_fetch_assoc($result)) {
+            $rows[] = $r;
+        }
+        Header('Content-Type: application/json');
+        die(json_encode($rows, JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+    }
+}
+
+function get_frequencias() {
+    $sql_periodos = "SELECT id, descricao, usuario `frequencia` WHERE usuario = ";
+    $link = get_conexao();
+    $usuario = filter_input(INPUT_GET, 'usuario');
+    if (is_numeric($usuario)) {
+        $sql_periodos .= $usuario;
+        $result = mysql_query($sql_periodos, $link);
+        $rows = array();
+        while ($r = mysql_fetch_assoc($result)) {
+            $rows[] = $r;
+        }
+        Header('Content-Type: application/json');
+        die(json_encode($rows, JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+    }
+}
+
 function get_lancamento($usuario, $ano, $mes) {
     $sql_lancamentos = "SELECT * FROM `vw_lancamentos_json` WHERE ";
     $link = get_conexao();
@@ -100,6 +132,12 @@ switch ($comando) {
         break;
     case 'balanco':
         get_balanco();
+        break;
+    case 'categorias':
+        get_categorias();
+        break;
+    case 'frequencias':
+        get_frequencias();
         break;
    
 }
