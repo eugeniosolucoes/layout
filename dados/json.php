@@ -52,6 +52,26 @@ function get_periodo() {
     }
 }
 
+function get_balanco() {
+    $sql_periodos = "SELECT mes, ano, creditos, debitos, balanco FROM `vw_periodos_json` WHERE usuario = ";
+    $link = get_conexao();
+    $usuario = filter_input(INPUT_GET, 'usuario');
+    $ano = filter_input(INPUT_GET, 'ano');
+    $mes = filter_input(INPUT_GET, 'mes');
+    if (is_numeric($usuario) && is_numeric($ano) && is_numeric($mes)) {
+        $sql_periodos .= $usuario;
+        $sql_periodos .= ' AND ano = ' . $ano;
+        $sql_periodos .= ' AND mes = ' . $mes;
+        $result = mysql_query($sql_periodos, $link);
+        $rows = array();
+        while ($r = mysql_fetch_assoc($result)) {
+            $rows[] = $r;
+        }
+        Header('Content-Type: application/json');
+        die(json_encode($rows, JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+    }
+}
+
 function get_lancamento($usuario, $ano, $mes) {
     $sql_lancamentos = "SELECT * FROM `vw_lancamentos_json` WHERE ";
     $link = get_conexao();
@@ -78,4 +98,8 @@ switch ($comando) {
     case 'periodo':
         get_periodo();
         break;
+    case 'balanco':
+        get_balanco();
+        break;
+   
 }
