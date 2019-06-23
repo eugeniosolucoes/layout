@@ -1,9 +1,6 @@
 var periodos;
-
 var lancamentos;
-
 var tabela;
-
 var saldo_atual = 0;
 
 $(document).ready(function () {
@@ -39,10 +36,10 @@ $(document).ready(function () {
 });
 
 function carregar_periodos() {
-    var meses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio',
+    let meses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio',
         'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
         'Novembro', 'Dezembro'];
-    var x;
+    let x;
     $('#list-periodos').empty();
     for (x in periodos) {
         var value = periodos[x].ano + '-' + periodos[x].mes;
@@ -52,7 +49,7 @@ function carregar_periodos() {
                         .attr("value", value)
                         .text(text));
     }
-    var prevGroup, $group = $();
+    let prevGroup, $group = $();
     $('#list-periodos option').remove().each(function () {
         var $option = $(this),
                 values = $option.val().split('-'),
@@ -72,9 +69,9 @@ function carregar_periodos() {
 }
 
 function now() {
-    var now = new Date();
-    var month = now.getMonth() + 1;
-    var year = now.getFullYear();
+    let now = new Date();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
     $('#list-periodos').val(year + '-' + month);
     selecionar_lancamentos();
 }
@@ -98,10 +95,10 @@ function carregar_lista() {
 }
 
 function preencher_tabela() {
-    var html = '';
-    var creditos = 0;
-    var debitos = 0;
-    var x;
+    let html = '';
+    let creditos = 0;
+    let debitos = 0;
+    let x;
     for (x in lancamentos) {
         html += '<tr ';
         html += ((x % 2) === 0) ? 'class="item odd" >' : 'class="item even" >';
@@ -181,9 +178,7 @@ function configurar_datatable() {
 }
 
 function get_lancamento(item) {
-
-    var lancamento = lancamentos[item];
-
+    let lancamento = lancamentos[item];
     lancamento_reset();
 
     $('#descricao').val(lancamento.descricao);
@@ -208,16 +203,11 @@ function get_lancamento(item) {
 }
 
 function selecionar_lancamentos() {
-    var op = $('#list-periodos option:selected');
-
+    let op = $('#list-periodos option:selected');
     if (op[0] !== null) {
-
-        var index = periodos[op[0].index];
-
+        let index = periodos[op[0].index];
         $('#label-year').html(index.ano);
-
         show_lancamentos(index);
-
     }
 }
 
@@ -227,20 +217,20 @@ function lancamento_reset() {
 }
 
 function calcular() {
-    var creditos = 0;
-    var debitos = 0;
+    let creditos = 0;
+    let debitos = 0;
     $("tr.item").each(function () {
         $this = $(this);
-        var valor_credito = $this.find("td.creditos").html();
+        let valor_credito = $this.find("td.creditos").html();
         if (!isNaN(valor_credito)) {
             creditos += new Number(valor_credito);
         }
-        var value_debito = $this.find("td.debitos").html();
+        let value_debito = $this.find("td.debitos").html();
         if (!isNaN(value_debito)) {
             debitos += new Number(value_debito);
         }
     });
-    var resultado = creditos - debitos;
+    let resultado = creditos - debitos;
     $('#total').html(Math.abs(resultado).toFixed(2));
     if (resultado >= 0) {
         $('#total').removeClass('debitos');
@@ -249,11 +239,10 @@ function calcular() {
         $('#total').removeClass('creditos');
         $('#total').addClass('debitos');
     }
-
 }
 
 function carregar_dados_periodos() {
-    var cache = localStorage.getItem("periodos-cache");
+    let cache = localStorage.getItem("periodos-cache");
     $("#div-load-data").show();
     if (cache === null) {
         $.ajax({
@@ -305,8 +294,7 @@ function show_lancamentos(index) {
 }
 
 function update_cache() {
-    var op = $('#list-periodos option:selected');
-
+    let op = $('#list-periodos option:selected');
     if (op[0] !== null) {
         var index = periodos[op[0].index];
         if (saldo_atual.toFixed(2) !== new Number(index.balanco).toFixed(2)) {
