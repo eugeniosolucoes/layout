@@ -114,9 +114,9 @@ function get_lancamento($usuario, $ano, $mes) {
         $sql_lancamentos .= ' ORDER by ano, mes ';
         $result = mysql_query($sql_lancamentos, $link);
         $rows = array();
-        while ($r = mysql_fetch_assoc($result)) {
-            $rows[] = $r;
-        }
+            while ($r = mysql_fetch_assoc($result)) {
+                $rows[] = $r;
+            }
         return $rows;
     }
 }

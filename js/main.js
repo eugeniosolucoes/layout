@@ -85,7 +85,7 @@ function carregar_lista() {
         try {
             tabela.destroy();
         } catch (e) {
-            console.info(e);
+            //console.info(e);
         }
     }
     preencher_tabela();
