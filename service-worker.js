@@ -1,6 +1,9 @@
 var files = [
   "index.html",
   "manifest.json",
+  "css/bootstrap.min.css",
+  "css/bootstrap-theme.min.css",
+  "css/jquery-ui.min.css",
   "css/dataTables.bootstrap.min.css",
   "css/main.css",
   "images/icons-192.png",
